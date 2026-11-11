@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>SolidCraft — инженерная графика · 10 заданий</title>
+  <style>
+    :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#eef3fa;background:#0e1520}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh}
+    .shell{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh}
+    aside{border-right:1px solid #29354b;background:#111b2b;padding:26px 17px;display:flex;flex-direction:column;gap:22px}
+    .brand{padding:2px 10px}
+    .eyebrow{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#76b7ff}
+    .brand h1{font-weight:780;font-size:23px;line-height:1.13;letter-spacing:-.035em;margin:13px 0 9px}
+    .brand p{font-size:12px;line-height:1.65;color:#9dacc4;margin:0}
+    .minihead{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#8698b0;font-weight:800;margin:0 10px 7px}
+    #tasks{display:flex;flex-direction:column;gap:5px}
+    .task{display:flex;align-items:center;gap:12px;width:100%;background:transparent;color:#b9c8dd;text-align:left;padding:11px;border:1px solid transparent;border-radius:11px;cursor:pointer;font:inherit;transition:background .15s,border-color .15s}
+    .task:hover{background:#1a2b43;color:white}
+    .task.active{background:#1c354e;border-color:#396288;color:#fff}
+    .task .num{display:grid;place-items:center;flex:none;width:35px;height:35px;border-radius:9px;background:#243246;color:#d9e7fb;font-weight:800;font-size:13px}
+    .task.active .num{background:#3184de;color:white}
+    .task strong{font-size:12.5px;display:block;line-height:1.25}
+    .task small{font-size:10.5px;color:#92a9c3;line-height:1.3;display:block;margin-top:4px}
+    .aside-bottom{margin-top:auto;padding:15px 11px 1px;border-top:1px solid #29354b;font-size:11px;color:#8295ad;line-height:1.65}
+    main{min-width:0;padding:26px clamp(16px,3.3vw,56px) 28px;display:flex;flex-direction:column;gap:17px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+    .top .sub{display:block;color:#97a7bf;font-size:12px;letter-spacing:.06em;margin-bottom:5px}
+    .top h2{font-size:clamp(21px,2.35vw,30px);letter-spacing:-.025em;margin:0;font-weight:700}
+    .actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+    button{font-family:inherit}
+    .btn{background:#1b293b;color:#e2edfc;border:1px solid #35455d;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+    .btn:hover{background:#2a3d56}
+    .btn:focus-visible,.task:focus-visible{outline:2px solid #83baff;outline-offset:3px}
+    .btn.primary{background:#3289e4;border-color:#3289e4;color:#fff}
+    .btn.primary:hover{background:#2377cb}
+    .btn.icon{min-width:40px;padding:10px 12px;font-size:16px}
+    .sheet-holder{background:#243148;border:1px solid #344458;border-radius:14px;padding:clamp(8px,1.55vw,19px);box-shadow:0 13px 35px #0002}
+    .paper{background:white;width:100%;border-radius:2px;line-height:0;box-shadow:0 2px 12px #0003;overflow:hidden}
+    #drawing{display:block;width:100%;height:auto;aspect-ratio:1200/850}
+    .under{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:18px}
+    .info{padding:0 3px}
+    .info strong{display:block;font-size:13px;margin-bottom:7px}
+    .info p{font-size:12px;color:#aebdd3;line-height:1.65;margin:0;max-width:800px}
+    .pagenav{display:flex;align-items:center;gap:10px;color:#91a5be;font-size:12px;white-space:nowrap}
+    .pagenav .btn{padding:9px 13px}
+    .mobile-tabs{display:none}
+    .toast{position:fixed;bottom:21px;right:22px;padding:13px 17px;background:#173953;border:1px solid #3985c1;color:#fff;border-radius:11px;box-shadow:0 10px 35px #0006;font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media print{@page{size:A4 landscape;margin:0}html,body{margin:0!important;padding:0!important;background:white!important}.shell{display:block!important}aside,.top,.under,.mobile-tabs,.toast{display:none!important}main{display:block!important;padding:0!important;margin:0!important}.sheet-holder,.paper{background:white!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important;margin:0!important}#drawing{display:block!important;width:100vw!important;height:auto!important;max-width:none!important}}
+    @media (max-width: 1050px){.shell{display:block}aside{display:none}main{padding:20px 15px}.mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 9px;scrollbar-width:thin}.mobile-tabs button{white-space:nowrap;border:1px solid #35455d;border-radius:9px;background:#1b293b;color:#c1d0e4;padding:9px 12px;font-size:11px;font-weight:700}.mobile-tabs button.active{background:#226db0;border-color:#226db0;color:white}}
+    @media (max-width: 650px){.top h2{font-size:22px}.actions{width:100%}.btn.primary{flex:1}.sheet-holder{padding:6px;border-radius:9px}.under{grid-template-columns:1fr}.pagenav{justify-content:space-between}main{gap:14px}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <div class="eyebrow">SolidCraft · Практикум</div>
+      <h1>Инженерная<br>графика</h1>
+      <p>Десять чертежей для самостоятельного построения 3D-моделей.</p>
+    </div>
+    <div>
+      <div class="minihead">Лабораторные работы</div>
+      <div id="tasks"></div>
+    </div>
+    <div class="aside-bottom">Миллиметры · Ортогональные виды<br>Стрелки ← → для переключения<br>Каждый лист можно сохранить как PNG.</div>
+  </aside>
+  <main>
+    <div class="top">
+      <div><span class="sub" id="taskSubtitle">ЛАБОРАТОРНАЯ № 1</span><h2 id="taskTitle">Г-образная пластина</h2></div>
+      <div class="actions">
+        <button class="btn" id="printBtn" title="Печатать текущий лист">⎙ Печать</button>
+        <button class="btn primary" id="saveBtn" title="Сохранить текущий чертёж в PNG">↓ Сохранить PNG</button>
+      </div>
+    </div>
+    <div id="mobileTabs" class="mobile-tabs" aria-label="Выбор задания"></div>
+    <div class="sheet-holder"><div class="paper"><svg id="drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" role="img" aria-label="Чертёж детали с ортогональными видами и размерами"></svg></div></div>
+    <div class="under">
+      <div class="info"><strong id="skillName"></strong><p id="skillText"></p></div>
+      <div class="pagenav"><button class="btn icon" id="prevBtn" aria-label="Предыдущее задание">←</button><span id="counter">1 из 10</span><button class="btn icon" id="nextBtn" aria-label="Следующее задание">→</button></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+'use strict';
+// Все чертежи созданы из векторных примитивов, без внешних библиотек и интернет-зависимостей.
+const SHEET_W=1200, SHEET_H=850;
+const jobs=[
+  {no:'1',id:'l_plate',title:'Г-образная пластина',short:'Г-образная пластина',complexity:'Эскиз из линий',desc:'Постройте плоский Г-образный контур, соблюдая габариты 50 × 40 мм и ширину обеих полок 10 мм. Затем выдавите его на 5 мм. Обратите внимание: главный вид показывает толщину, а форму определяет вид сверху.'},
+  {no:'2',id:'u_plate',title:'П-образная деталь',short:'П-образная деталь',complexity:'Внутренний вырез',desc:'Создайте плоскую деталь 40 × 30 × 8 мм с открытым П-образным вырезом шириной 20 мм и глубиной 20 мм. Боковые стенки и перемычка — по 10 мм.'},
+  {no:'3',id:'step',title:'Ступенчатый блок',short:'Ступенчатый блок',complexity:'Два уровня и боковые отверстия',desc:'Сначала создайте основание 40 × 20 × 5 мм, затем по центру длинной стороны добавьте выступ 20 × 20 × 5 мм. В боковых панелях выполните два отверстия Ø3 мм с фаской 1 × 45°.'},
+  {no:'4',id:'wedge',title:'Клиновидная проставка',short:'Клиновидная проставка',complexity:'Наклонная грань и фиксатор',desc:'Восстановите клин длиной 40 мм, шириной 20 мм и максимальной высотой 15 мм. На гипотенузе выполните квадратный срез-фиксатор 5 × 5 мм: деталь должна подниматься по клину и упираться в вертикальную стенку фиксатора, не доходя до вершины.'},
+  {no:'5',id:'sleeve',title:'Цилиндрическая проставка',short:'Цилиндрическая проставка',complexity:'Два диаметра и поперечное отверстие',desc:'По видам постройте цилиндрическую втулку: наружный диаметр 16 мм, внутренний сквозной диаметр 5 мм, высота 12 мм. Добавьте центральное поперечное отверстие Ø3 мм для фиксации втулки на валу.'},
+  {no:'6',id:'flange',title:'Круглый фланец',short:'Круглый фланец',complexity:'Окружность отверстий',desc:'Постройте диск Ø40 × 5 мм с центральным отверстием Ø8 мм и четырьмя сквозными отверстиями Ø3 мм на делительной окружности Ø28 мм. Отверстия расположены через 90°.'},
+  {no:'7',id:'blind',title:'Блок с глухим отверстием',short:'Блок с глухим отверстием',complexity:'Первый разрез А–А',desc:'Постройте блок 30 × 30 × 15 мм. Центральное отверстие имеет диаметр 12 мм и глубину 10 мм. Прочитайте разрез А–А: оставшееся дно имеет толщину 5 мм.'},
+  {no:'8',id:'angle_bracket',title:'Угловой кронштейн',short:'Угловой кронштейн',complexity:'Г-профиль и отверстия на двух гранях',desc:'Габариты 40 × 20 × 30 мм, толщина обеих стенок 5 мм. В основании — два сквозных Ø3,5 мм на расстоянии 30 мм от левого края, с центрами 5 мм от длинных кромок. В вертикальной стенке — сквозное Ø5 мм, по центру ширины на высоте 20 мм от основания. Совместите Г-образное выдавливание и сверление в двух направлениях.'},
+  {no:'9',id:'wedge_stop',title:'Клиновой упор с креплением',short:'Клиновой упор',complexity:'Клин, фиксатор и монтажные отверстия',desc:'Основание 55 × 25 × 5 мм. Клиновой выступ высотой до 20 мм занимает первые 35 мм длины. У левого края сделайте фиксатор шириной 5 мм и высотой 5 мм над наклонной гранью. На свободной площадке два сквозных отверстия Ø4 мм; их центры: X=45 мм, Y=5 и 20 мм от левого нижнего угла основания.'},
+  {no:'10',id:'flanged_hub',title:'Фланцевая ступица',short:'Фланцевая ступица',complexity:'Фланец, выступ, массив и радиальный стопор',desc:'Диск Ø40 × 5 мм с соосной бобышкой Ø20 × 15 мм. Центральное отверстие Ø6 мм проходит насквозь. На окружности Ø30 мм сделайте четыре крепёжных отверстия Ø3 мм сквозь фланец. В стенке бобышки — радиальное Ø3 мм на высоте 12,5 мм от нижней плоскости до центрального отверстия.'}
+];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+const f=n=>Number(n).toFixed(2).replace(/\.00$/,'');
+function el(tag, attrs={}, inner='') { return `<${tag} ${Object.entries(attrs).map(([k,v])=>`${k}="${esc(v)}"`).join(' ')}>${inner}</${tag}>`; }
+function line(x1,y1,x2,y2,kind='solid',extra={}){
+  const attrs={x1:f(x1),y1:f(y1),x2:f(x2),y2:f(y2),stroke:kind==='dim'?'#3e444a':'#111820','stroke-width':kind==='solid'?2.2:kind==='cut'?2.8:kind==='axis'?1.05:1.1,'vector-effect':'non-scaling-stroke',...extra};
+  if(kind==='hidden')attrs['stroke-dasharray']='7 5';
+  if(kind==='axis')attrs['stroke-dasharray']='17 5 3 5';
+  return el('line',attrs);
+}
+function rect(x,y,w,h,extra={}){return el('rect',{x:f(x),y:f(y),width:f(w),height:f(h),fill:'none',stroke:'#131922','stroke-width':2.2,'vector-effect':'non-scaling-stroke',...extra})}
+function circle(cx,cy,r,extra={}){return el('circle',{cx:f(cx),cy:f(cy),r:f(r),fill:'none',stroke:'#111820','stroke-width':2.1,'vector-effect':'non-scaling-stroke',...extra})}
+function path(d,extra={}){return el('path',{d,fill:'none',stroke:'#111820','stroke-width':2.1,'stroke-linejoin':'miter','vector-effect':'non-scaling-stroke',...extra})}
+function txt(x,y,label,extra={}){return el('text',{x:f(x),y:f(y),fill:'#202830',font:'17px Arial, sans-serif','text-anchor':'middle',...extra},esc(label))}
+function note(x,y,label){return txt(x,y,label,{fill:'#58616b',font:'14px Arial, sans-serif','letter-spacing':'.6px'})}
+function dimH(x1,x2,objY,dimY,label){
+  const e=dimY>objY?7:-7, len=x2-x1;
+  return `<g>${line(x1,objY+e,x1,dimY+e,'dim')}${line(x2,objY+e,x2,dimY+e,'dim')}${line(x1,dimY,x2,dimY,'dim',{ 'marker-start':'url(#arr)','marker-end':'url(#arr)'})}${txt((x1+x2)/2,dimY-8,label,{font:'17px Arial, sans-serif',fill:'#222'})}</g>`;
+}
+function dimV(y1,y2,objX,dimX,label){
+  const e=dimX>objX?7:-7;
+  return `<g>${line(objX+e,y1,dimX+e,y1,'dim')}${line(objX+e,y2,dimX+e,y2,'dim')}${line(dimX,y1,dimX,y2,'dim',{'marker-start':'url(#arr)','marker-end':'url(#arr)'})}${txt(dimX-9,(y1+y2)/2,label,{transform:`rotate(-90 ${f(dimX-9)} ${f((y1+y2)/2)})`,font:'17px Arial, sans-serif',fill:'#222','dominant-baseline':'central'})}</g>`;
+}
+function leader(x1,y1,x2,y2,x3,y3,label,anchor='start'){
+  const actualAnchor=anchor==='end'?'end':'start', offset=actualAnchor==='end'?-5:5;
+  return `${line(x1,y1,x2,y2,'dim')}${line(x2,y2,x3,y3,'dim')}${circle(x1,y1,2.8,{fill:'#333',stroke:'none'})}${txt(x3+offset,y3-6,label,{font:'16px Arial, sans-serif','text-anchor':actualAnchor,fill:'#222'})}`;
+}
+function axes(cx,cy,size=25){return line(cx-size,cy,cx+size,cy,'axis')+line(cx,cy-size,cx,cy+size,'axis')+circle(cx,cy,2,{stroke:'#222','stroke-width':1})}
+function cutMark(x1,y,x2,label){
+ return line(x1,y,x2,y,'axis',{ 'stroke-width':1.7 })+line(x1,y-8,x1,y+8,'cut')+line(x2,y-8,x2,y+8,'cut')+
+  // Arrows indicate section looking toward top of page.
+  path(`M${f(x1-5)} ${f(y-16)} L${f(x1)} ${f(y-7)} L${f(x1+5)} ${f(y-16)}`,{stroke:'#111','stroke-width':1.6})+
+  path(`M${f(x2-5)} ${f(y-16)} L${f(x2)} ${f(y-7)} L${f(x2+5)} ${f(y-16)}`,{stroke:'#111','stroke-width':1.6})+
+  txt(x1-14,y-25,label,{font:'bold 18px Arial'})+txt(x2+14,y-25,label,{font:'bold 18px Arial'});
+}
+function labelView(x,y,str){return note(x,y,str)}
+function defs(){return `<defs><marker id="arr" markerWidth="9" markerHeight="9" refX="5" refY="4" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 L2.2 4 Z" fill="#333"/></marker><pattern id="hatch" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="12" stroke="#84909b" stroke-width="1.2" /></pattern></defs>`}
+function frame(job){
+  const bottomY=743, blockY=744;
+  let s=defs()+rect(0,0,1200,850,{stroke:'none',fill:'#fff'});
+  s+=rect(37,34,1126,782,{stroke:'#28303b','stroke-width':1.4});
+  s+=line(37,106,1163,106,'dim',{stroke:'#c2c7ce'});
+  s+=txt(69,64,'SOLIDCRAFT  /  ИНЖЕНЕРНАЯ ГРАФИКА',{'text-anchor':'start',font:'bold 13px Arial',fill:'#33465e','letter-spacing':'1.2px'});
+  s+=txt(69,89,'ПОСТРОЙТЕ ТРЁХМЕРНУЮ МОДЕЛЬ ПО ЧЕРТЕЖУ',{'text-anchor':'start',font:'12px Arial',fill:'#68717a','letter-spacing':'.45px'});
+  s+=txt(1136,65,`ЗАДАНИЕ № ${job.no}`,{'text-anchor':'end',font:'bold 20px Arial',fill:'#172736'});
+  s+=txt(1136,88,'Все размеры в миллиметрах',{'text-anchor':'end',font:'13px Arial',fill:'#5c6974'});
+  s+=line(37,bottomY,1163,bottomY,'dim',{stroke:'#28303b','stroke-width':1.6});
+  s+=line(660,bottomY,660,816,'dim',{stroke:'#28303b'});
+  s+=line(908,bottomY,908,816,'dim',{stroke:'#28303b'});
+  s+=line(1057,bottomY,1057,816,'dim',{stroke:'#28303b'});
+  s+=line(660,779,1163,779,'dim',{stroke:'#28303b'});
+  s+=txt(57,764,'НАИМЕНОВАНИЕ',{'text-anchor':'start',font:'11px Arial',fill:'#6d7885'});
+  s+=txt(57,797,job.title,{'text-anchor':'start',font:'bold 22px Arial',fill:'#1b2634'});
+  s+=txt(675,762,'МАТЕРИАЛ',{'text-anchor':'start',font:'11px Arial',fill:'#6d7885'});
+  s+=txt(675,802,'Не задан',{'text-anchor':'start',font:'15px Arial'});
+  s+=txt(923,762,'МАСШТАБ',{'text-anchor':'start',font:'11px Arial',fill:'#6d7885'});
+  s+=txt(923,802,'Условный',{'text-anchor':'start',font:'15px Arial'});
+  s+=txt(1073,762,'ЛИСТ',{'text-anchor':'start',font:'11px Arial',fill:'#6d7885'});
+  s+=txt(1110,802,`${jobs.findIndex(j=>j.no===job.no)+1} / ${jobs.length}`,{font:'bold 18px Arial'});
+  return s;
+}
+// X -> right, Y -> upward in top view. A4 first-angle arrangement: top view BELOW front, left view to the RIGHT.
+function drawL(){
+ let s=''; const x=245, fx=x, fRight=495, fTop=279, fBottom=304, pBottom=615, sc=5;
+ s+=rect(fx,fTop,250,25)+line(295,fTop,295,fBottom,'hidden');
+ s+=labelView(370,252,'Главный вид');
+ const points=[[0,0],[50,0],[50,10],[10,10],[10,40],[0,40]];
+ const d=points.map((p,i)=>`${i?'L':'M'}${f(x+p[0]*sc)} ${f(pBottom-p[1]*sc)}`).join(' ')+' Z';
+ s+=path(d);
+ s+=labelView(370,710,'Вид сверху');
+ s+=dimH(245,495,615,677,'50');s+=dimV(415,615,245,180,'40');
+ s+=dimH(245,295,415,381,'10');s+=dimV(565,615,495,541,'10');
+ s+=dimV(279,304,495,541,'5');
+ // Left side projection: 40mm along horizontal.
+ s+=rect(727,279,200,25)+line(777,279,777,304,'hidden');
+ s+=labelView(827,252,'Вид слева');
+ return s;
+}
+function drawStep(){
+ let s='';
+ // Деталь: основание 40×20×5 и верхняя ступень 20×20×5; в боковых площадках 2 крепёжных отверстия Ø3 с фаской 1×45°.
+ // Главный вид
+ s+=path(`M252 366 H492 V336 H432 V306 H312 V336 H252 Z`);
+ s+=line(252,336,312,336)+line(432,336,492,336);
+ s+=line(312,336,432,336,'hidden');
+ // Hidden projection of vertical mounting holes in front view
+ [[282,351],[462,351]].forEach(([cx,cy])=>{
+   s+=line(cx-9,336,cx-9,366,'hidden')+line(cx+9,336,cx+9,366,'hidden');
+   s+=line(cx,337,cx,365,'axis')+line(cx-14,cy,cx+14,cy,'axis');
+ });
+ s+=labelView(372,208,'Главный вид');
+ s+=dimH(252,492,366,423,'40');
+ s+=dimH(312,432,306,269,'20');
+ s+=dimV(306,366,252,199,'10');
+ s+=dimV(336,366,492,532,'5');
+ s+=leader(462,336,555,445,620,445,'2 отв. Ø3, фаска 1×45°');
+ 
+ // Вид сверху
+ s+=rect(252,519,240,120)+line(312,519,312,639)+line(432,519,432,639);
+ [[282,579],[462,579]].forEach(([cx,cy])=>{
+   s+=circle(cx,cy,14,{fill:'none'})+circle(cx,cy,9,{fill:'none'});
+   s+=line(cx,cy-18,cx,cy+18,'axis')+line(cx-18,cy,cx+18,cy,'axis');
+ });
+ s+=labelView(372,703,'Вид сверху');
+ s+=dimV(519,639,252,198,'20');
+ 
+ // Вид слева
+ s+=rect(731,306,120,60)+line(731,336,851,336);
+ // Overlapped projection of the two vertical holes
+ s+=line(782,306,782,366,'hidden')+line(800,306,800,366,'hidden');
+ s+=line(791,296,791,377,'axis');
+ s+=labelView(791,208,'Вид слева');
+ s+=dimH(731,851,306,275,'20');
+ return s;
+}
+function drawWedge(){
+ let s='';
+ // Клиновидная проставка 40×20, h=15 с квадратным фиксатором 5×5 на гипотенузе.
+ s+=path('M248 380 L248 290 L278 290 L278 320 L488 380 Z');
+ s+=labelView(368,252,'Главный вид');
+ s+=dimH(248,488,380,421,'40');s+=dimV(290,380,248,194,'15');
+ s+=dimH(248,278,290,258,'5');s+=dimV(290,320,278,242,'5');
+ s+=leader(278,320,344,278,440,278,'фиксатор 5×5');
+ // top view rectangular footprint and edge of the stop
+ s+=rect(248,520,240,120)+line(278,520,278,640);
+ s+=labelView(368,704,'Вид сверху');s+=dimV(520,640,248,194,'20');
+ // left end view height 15 full width 20
+ s+=rect(725,290,120,90);
+ s+=labelView(785,207,'Вид слева');s+=dimH(725,845,290,264,'20');
+ return s;
+}
+function drawU(){
+ let s='';
+ const x=260, b=635, sc=5.5;
+ // Projected front along -Y, 40 by 8 mm
+ s+=rect(x,282,220,44);
+ s+=line(315,282,315,326,'hidden')+line(425,282,425,326,'hidden');
+ s+=labelView(370,247,'Главный вид');s+=dimV(282,326,480,518,'8');
+ const poly=[[0,0],[40,0],[40,30],[30,30],[30,10],[10,10],[10,30],[0,30]];
+ s+=path(poly.map((p,i)=>`${i?'L':'M'}${f(x+p[0]*sc)} ${f(b-p[1]*sc)}`).join(' ')+' Z');
+ s+=labelView(370,715,'Вид сверху');
+ s+=dimH(260,480,635,680,'40');s+=dimV(470,635,260,197,'30');
+ s+=dimH(315,425,525,500,'20');
+ s+=dimV(470,580,425,558,'20');
+ s+=dimH(260,315,470,440,'10');
+ // side view: bottom bar masks back recess, dashed at 10mm from front
+ s+=rect(736,282,165,44)+line(791,282,791,326,'hidden');
+ s+=labelView(818,247,'Вид слева');
+ return s;
+}
+function drawSleeve(){
+ let s=''; const x=312, y=279, w=144, h=108, cx=384, cy=570;
+ // Front view cylindrical sleeve 16 wide, 12 high with 5mm axial hole and 3mm cross-hole
+ s+=rect(x,y,w,h);
+ s+=line(cx-22.5,y,cx-22.5,y+h,'hidden')+line(cx+22.5,y,cx+22.5,y+h,'hidden');
+ // hidden projection of the cross hole
+ s+=line(x,y+h/2-13.5,x+w,y+h/2-13.5,'hidden')+line(x,y+h/2+13.5,x+w,y+h/2+13.5,'hidden');
+ s+=line(cx,265,cx,402,'axis');
+ s+=labelView(cx,240,'Главный вид');
+ s+=dimV(y,y+h,x,264,'12');s+=dimH(x,x+w,y+h,429,'Ø16');
+ // Top view annulus, with hidden projection of the cross-hole band
+ s+=circle(cx,cy,72)+circle(cx,cy,22.5)+axes(cx,cy,87);
+ s+=line(cx-72,cy-13.5,cx+72,cy-13.5,'hidden')+line(cx-72,cy+13.5,cx+72,cy+13.5,'hidden');
+ s+=labelView(cx,704,'Вид сверху');
+ s+=leader(cx+16,cy-16,467,515,505,515,'Ø5 сквозное');
+ // side view: cross hole is visible as a circle in the centre
+ s+=rect(736,y,w,h)+line(786.75,y,786.75,y+h,'hidden')+line(829.25,y,829.25,y+h,'hidden');
+ s+=circle(808,333,13.5,{fill:'none'})+line(808,319,808,347,'axis')+line(794,333,822,333,'axis');
+ s+=line(808,265,808,402,'axis');s+=labelView(808,240,'Вид слева');
+ s+=leader(822,333,884,311,974,311,'Ø3 поперечное');
+ return s;
+}
+function drawFlange(){
+ let s=''; const cx=381,cy=568,r=112, sc=5.6, y=305;
+ // Front of disk, center bore hidden; axis line.
+ s+=rect(cx-r,y,r*2,28);
+ s+=line(cx-22.4,y,cx-22.4,333,'hidden')+line(cx+22.4,y,cx+22.4,333,'hidden');
+ s+=line(cx,286,cx,355,'axis');
+ s+=labelView(cx,265,'Главный вид');s+=dimV(305,333,cx+r,542,'5');
+ // Top view
+ s+=circle(cx,cy,r)+circle(cx,cy,22.4);
+ const br=78.4, rr=8.4;
+ [[cx+br,cy],[cx-br,cy],[cx,cy-br],[cx,cy+br]].forEach(p=>s+=circle(p[0],p[1],rr));
+ // bolt PCD shown dashed
+ s+=circle(cx,cy,br,{stroke:'#89939c','stroke-width':1.1,'stroke-dasharray':'16 5 3 5'});
+ s+=axes(cx,cy,130);
+ s+=labelView(753,673,'Вид сверху');
+ s+=dimH(cx-r,cx+r,cy+r,710,'Ø40');
+ s+=leader(cx+15,cy-16,492,487,552,487,'Ø8 сквозное');
+ s+=leader(cx+br-2,cy-rr,545,418,615,418,'4 отв. Ø3');
+ s+=leader(cx-br*.71,cy-br*.71,218,424,177,424,'Ø28 — центры','end');
+ // Side view
+ s+=rect(743,y,224,28)+line(855,y-16,855,351,'axis');
+ s+=labelView(855,265,'Вид слева');
+ return s;
+}
+function drawBlind(){
+ let s=''; const x=256,y=294,w=180,h=90, cx=346;
+ // Front projected: 30x15, blind hole dashed, ends in bottom at y=354.
+ s+=rect(x,y,w,h);
+ s+=line(310,y,310,354,'hidden')+line(382,y,382,354,'hidden')+line(310,354,382,354,'hidden');
+ s+=line(cx,283,cx,396,'axis');
+ s+=labelView(cx,254,'Главный вид');
+ s+=dimH(x,x+w,y+h,424,'30');
+ s+=dimV(y,y+h,x,217,'15');
+ // Top view
+ s+=rect(256,480,180,180)+circle(cx,570,36)+axes(cx,570,104);
+ s+=cutMark(239,570,453,'А');
+ s+=labelView(cx,701,'Вид сверху');
+ s+=dimV(480,660,256,203,'30');
+ s+=leader(365,541,445,475,500,475,'Ø12');
+ // Side view looks the same for symmetric square.
+ s+=rect(643,y,180,h)+line(697,y,697,354,'hidden')+line(769,y,769,354,'hidden')+line(697,354,769,354,'hidden');
+ s+=line(733,283,733,396,'axis');
+ s+=labelView(733,254,'Вид слева');
+ // Section through hole. Outline of actual material is a U shape, fill with hatching.
+ const qx=885,qy=294;
+ s+=path(`M885 294 H939 V354 H1011 V294 H1065 V384 H885 Z`,{fill:'url(#hatch)','fill-rule':'evenodd'});
+ s+=line(975,280,975,397,'axis');
+ s+=labelView(975,254,'Разрез А–А');
+ s+=dimV(294,354,1065,1113,'10');
+ s+=dimV(354,384,1065,1152,'5');
+ s+=dimH(939,1011,294,331,'Ø12');
+ return s;
+}
+
+function drawAngleBracket(){
+ let s='';
+ // Geometry: L profile extruded 20 mm in Y; 40 long, 30 tall, 5 thick.
+ const x=252,b=405,sc=6, yTop=225, yBase=375;
+ s+=path(`M252 225 H282 V375 H492 V405 H252 Z`);
+ // Vertical mounting holes in the base, hidden behind the front elevation.
+ s+=line(421.5,yBase,421.5,b,'hidden')+line(442.5,yBase,442.5,b,'hidden');
+ // Wall's Ø5 hole, projected along X and hidden in frontal view
+ s+=line(252,270,282,270,'hidden')+line(252,300,282,300,'hidden');
+ s+=line(252,285,289,285,'axis');
+ s+=labelView(372,169,'Главный вид');
+ s+=dimH(252,492,405,450,'40');
+ s+=dimV(225,405,252,201,'30');
+ s+=dimH(252,282,225,197,'5');
+ s+=dimV(375,405,492,535,'5');
+ // Plan view shows both holes and the upright wall's projection.
+ s+=rect(252,520,240,120)+line(282,520,282,640);
+ for(const yy of [550,610]){
+  s+=circle(432,yy,10.5)+axes(432,yy,17);
+ }
+ s+=labelView(372,719,'Вид сверху');
+ s+=dimV(520,640,252,209,'20');
+ s+=dimV(520,550,492,556,'5');s+=dimV(610,640,492,556,'5');
+ s+=dimH(252,432,520,486,'30');
+ s+=leader(432,550,550,480,615,480,'2 отв. Ø3,5');
+ // View from left, wall Ø5 is a circle.
+ s+=rect(746,225,120,180);
+ s+=circle(806,285,15)+axes(806,285,22);
+ s+=labelView(806,169,'Вид слева');
+ s+=dimH(746,866,225,194,'20');
+ s+=dimV(285,405,866,925,'20');
+ s+=leader(820,280,902,246,986,246,'Ø5 сквозное');
+ return s;
+}
+function drawWedgeStop(){
+ let s='';
+ // Base 55×25×5, profile ramp to height 20; 5-mm high stop and two vertical Ø4 holes.
+ const X=240,B=405, YTOP=285;
+ s+=path(`M240 285 H270 V315 L450 375 H570 V405 H240 Z`);
+ // Mounting holes are vertical: shown as hidden in frontal view.
+ s+=line(498,375,498,405,'hidden')+line(522,375,522,405,'hidden');
+ s+=line(510,369,510,410,'axis');
+ s+=labelView(405,230,'Главный вид');
+ s+=dimH(240,570,405,469,'55');
+ s+=dimH(240,450,405,443,'35');
+ s+=dimV(285,405,240,195,'20');
+ s+=dimV(375,405,570,615,'5');
+ s+=dimH(240,270,285,259,'5');
+ s+=dimV(285,315,270,327,'5');
+ // Plan: stop and inclined region cover width, free base is on the right.
+ s+=rect(240,520,330,150);
+ s+=line(270,520,270,670)+line(450,520,450,670);
+ for(const yy of [550,640]){
+  s+=circle(510,yy,12)+axes(510,yy,20);
+ }
+ s+=labelView(405,719,'Вид сверху');
+ s+=dimV(520,670,240,194,'25');
+ s+=dimV(520,550,570,623,'5');s+=dimV(640,670,570,623,'5');
+ s+=dimH(510,570,670,706,'10');
+ s+=leader(510,550,618,510,690,510,'2 отв. Ø4');
+ // End view sees a solid rectangular front plane.
+ s+=rect(748,285,150,120);
+ s+=labelView(823,230,'Вид слева');
+ s+=dimH(748,898,285,254,'25');
+ return s;
+}
+function drawFlangedHub(){
+ let s='';
+ // Flange Ø40×5; concentric boss Ø20×15; bore Ø6 through; 4×Ø3 on Ø30 PCD;
+ // one radial hole Ø3 into bore at Z=12.5 measured from bottom.
+ const cx=370,bot=415,flTop=385,bossTop=295, topCy=565;
+ s+=path(`M250 415 H490 V385 H430 V295 H310 V385 H250 Z`);
+ s+=line(cx-18,295,cx-18,415,'hidden')+line(cx+18,295,cx+18,415,'hidden');
+ // Bolt holes passing through the flange (outer visible positions projected from top).
+ for(const xx of [280,460]){
+  s+=line(xx-9,385,xx-9,415,'hidden')+line(xx+9,385,xx+9,415,'hidden');
+ }
+ // The lateral radial Ø3 hole is hidden from front viewing direction.
+ s+=line(310,331,352,331,'hidden')+line(310,349,352,349,'hidden');
+ s+=line(cx,282,cx,426,'axis');
+ s+=labelView(cx,233,'Главный вид');
+ s+=dimH(310,430,295,267,'Ø20');
+ s+=dimV(295,415,310,202,'20');
+ s+=dimV(385,415,490,549,'5');
+ s+=dimV(295,385,430,516,'15');
+ // Top view with central bore, boss and circular 4-hole pattern.
+ s+=circle(cx,topCy,120)+circle(cx,topCy,60)+circle(cx,topCy,18);
+ const br=90;
+ for(const [dx,dy] of [[br,0],[-br,0],[0,br],[0,-br]])s+=circle(cx+dx,topCy+dy,9);
+ s+=circle(cx,topCy,br,{stroke:'#87939d','stroke-width':1.1,'stroke-dasharray':'16 5 3 5'});
+ s+=axes(cx,topCy,140);
+ s+=labelView(370,718,'Вид сверху');
+ s+=leader(cx+83,topCy-83,531,472,594,472,'Ø40');
+ s+=leader(cx+12,topCy-12,518,505,580,505,'Ø6 сквозное');
+ s+=leader(460,topCy,529,616,580,616,'4 отв. Ø3 на Ø30');
+ // Left view: radial hole visible in cylindrical boss.
+ s+=path(`M714 415 H954 V385 H894 V295 H774 V385 H714 Z`);
+ s+=line(816,295,816,415,'hidden')+line(852,295,852,415,'hidden');
+ s+=circle(834,340,9)+axes(834,340,16);
+ s+=labelView(834,233,'Вид слева');
+ s+=dimV(340,415,954,1018,'12,5');
+ s+=leader(842,335,965,292,1019,292,'Ø3 радиальное');
+ return s;
+}
+
+const drawFns={l_plate:drawL,step:drawStep,wedge:drawWedge,u_plate:drawU,sleeve:drawSleeve,flange:drawFlange,blind:drawBlind,angle_bracket:drawAngleBracket,wedge_stop:drawWedgeStop,flanged_hub:drawFlangedHub};
+let current=0;
+const $=id=>document.getElementById(id);
+function sheetMarkup(index){const j=jobs[index];return frame(j)+drawFns[j.id]();}
+function renderTabs(){
+ const html=jobs.map((j,i)=>`<button type="button" class="task ${i===current?'active':''}" data-i="${i}" aria-current="${i===current?'page':'false'}"><span class="num">${j.no}</span><span><strong>${j.short}</strong><small>${j.complexity}</small></span></button>`).join('');
+ $('tasks').innerHTML=html;
+ $('mobileTabs').innerHTML=jobs.map((j,i)=>`<button type="button" class="${i===current?'active':''}" data-i="${i}">№${j.no} ${j.short}</button>`).join('');
+ document.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>setCurrent(Number(b.dataset.i))));
+}
+function setCurrent(i){current=(i+jobs.length)%jobs.length;const j=jobs[current];$('drawing').innerHTML=sheetMarkup(current);$('taskTitle').textContent=j.title;$('taskSubtitle').textContent=`ЛАБОРАТОРНАЯ № ${j.no}`;$('skillName').textContent=`Что тренируем: ${j.complexity.toLowerCase()}`;$('skillText').textContent=j.desc;$('counter').textContent=`${current+1} из ${jobs.length}`;renderTabs();}
+function toast(text){const t=$('toast');t.textContent=text;t.classList.add('show');window.clearTimeout(toast.timer);toast.timer=window.setTimeout(()=>t.classList.remove('show'),3200)}
+async function savePNG(){
+ const j=jobs[current], btn=$('saveBtn');btn.disabled=true;btn.textContent='Подготовка PNG…';
+ try {
+  // 3x export: 3600x2550 px. Geometry/text retain high fidelity.
+  const clone=$('drawing').cloneNode(true);clone.setAttribute('width',SHEET_W);clone.setAttribute('height',SHEET_H);
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  clone.removeAttribute('role');clone.removeAttribute('aria-label');
+  const serialized=new XMLSerializer().serializeToString(clone);
+  const blob=new Blob([serialized],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  try {
+   const img=new Image();
+   await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});
+   const scale=3,canvas=document.createElement('canvas');canvas.width=SHEET_W*scale;canvas.height=SHEET_H*scale;
+   const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+   if(!png)throw Error('canvas.toBlob returned null');
+   const pngUrl=URL.createObjectURL(png),link=document.createElement('a');link.href=pngUrl;link.download=`SolidCraft_Задание_${j.no}_${j.id}.png`;document.body.append(link);link.click();link.remove();
+   window.setTimeout(()=>URL.revokeObjectURL(pngUrl),10000);
+   toast(`Задание № ${j.no} сохранено в PNG (3600 × 2550)`);
+  } finally {URL.revokeObjectURL(url)}
+ }catch(err){console.error(err);toast('Не удалось сохранить PNG. Попробуйте открыть файл в Chrome или Edge.')}finally{btn.disabled=false;btn.textContent='↓ Сохранить PNG';}
+}
+function printSheet(){window.print();}
+$('prevBtn').addEventListener('click',()=>setCurrent(current-1));
+$('nextBtn').addEventListener('click',()=>setCurrent(current+1));
+$('saveBtn').addEventListener('click',savePNG);
+$('printBtn').addEventListener('click',printSheet);
+document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowLeft'){setCurrent(current-1)}if(e.key==='ArrowRight'){setCurrent(current+1)}});
+let touchX=null;$('drawing').addEventListener('touchstart',e=>{touchX=e.touches[0]?.clientX},{passive:true});$('drawing').addEventListener('touchend',e=>{if(touchX===null)return;const dx=e.changedTouches[0].clientX-touchX;if(Math.abs(dx)>70)setCurrent(current+(dx<0?1:-1));touchX=null},{passive:true});
+setCurrent(0);
+</script>
+</body></html>
